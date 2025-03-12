@@ -1,10 +1,6 @@
 {
-    "extensions.recommendations": [
-        "ms-python.python",
-        "ms-python.black-formatter"
-    ],
-    "editor.formatOnSave": true,
     "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter"
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
     }
 }
