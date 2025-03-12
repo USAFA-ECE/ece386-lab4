@@ -35,7 +35,7 @@ def webcam_to_numpy(webcam: cv2.VideoCapture, img_dims: tuple[int, int]) -> np.n
 def infer_dog_cat(model, img: np.ndarray) -> tuple[str, float]:
     """Run inference on a model with an image and return the prediction and probability."""
     # Run inference
-    prediction = model.predict(img)
+    prediction = model.predict(img)[0][0]
     # Binary, so check if below threshold
     if prediction < BINARY_THRESHOLD:
         return "cat", prediction
@@ -59,7 +59,7 @@ if __name__ == "__main__":
             # Default to 10 if optional argument not provided
             number_pics = 10
     else:
-        print("Usage: python infer.py <model_file_path> [<number_pics>]")
+        logging.error("Usage: python infer.py <model_file_path> [<number_pics>]")
         exit(1)
 
     model = keras.models.load_model(model_path)
@@ -70,12 +70,16 @@ if __name__ == "__main__":
 
     log(f"Running inference for {number_pics} pictures")
 
-    # Conduct inference until loop is complete
-    for i in range(number_pics):
-        img = webcam_to_numpy(webcam, (150, 150))
-        prediction, probability = infer_dog_cat(model, img)
-        log(prediction)
+    # Make sure we release webcam, even if an exception occurs
+    try:
+        # Conduct inference until loop is complete
+        for i in range(number_pics):
+            img = webcam_to_numpy(webcam, (150, 150))
+            prediction, probability = infer_dog_cat(model, img)
+            log(prediction)
+    finally:
+        # Release even if exception earlier
+        webcam.release()
+        log("Webcam released")
 
-    # Release the camera
-    webcam.release()
     log("Program complete")
